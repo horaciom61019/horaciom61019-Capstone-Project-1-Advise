@@ -1,0 +1,22 @@
+{% extends 'users/detail.html' %}
+{% block user_details %}
+  <div class="col-sm-6">
+    <ul class="list-group" id="messages">
+
+      {% for advice in advice %}
+
+        <li class="list-group-item">
+          <a href="/advice/{{ advice.id }}" class="message-link"/>
+
+          <div class="advice-area">
+            <a href="/users/{{ user.id }}">@{{ user.username }}</a>
+            <span class="text-muted">{{ advice.timestamp.strftime('%d %B %Y') }}</span>
+            <p>{{ advice.text }}</p>
+          </div>
+        </li>
+
+      {% endfor %}
+
+    </ul>
+  </div>
+{% endblock %}

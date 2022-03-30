@@ -1,10 +1,31 @@
 """ SQLAlchemy models """
 
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
+
+
+class Advice(db.Model):
+    """ An individual advice """
+
+    __tablename__ = "advice"
+
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String, nullable=False)
+
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow(),
+    )
+
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', cascade="all, delete")
+
 
 class User(db.Model):
     """ User in the system """
@@ -15,38 +36,12 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
 
-    advise = db.relationship('Advise')
+    advice = db.relationship('Advice', back_populates='user')
 
-    followers = db.relationship(
-        "User",
-        secondary="follows",
-        primaryjoin=(Follows.user_being_followed_id == id),
-        secondaryjoin=(Follows.user_following_id == id)
-    )
-
-    following = db.relationship(
-        "User",
-        secondary="follows",
-        primaryjoin=(Follows.user_following_id == id),
-        secondaryjoin=(Follows.user_being_followed_id == id)
-    )
-
-    likes = db.relationship('Advise', secondary="likes")
+    likes = db.relationship('Advice', secondary="likes")
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}>"
-
-    def is_followed_by(self, other_user):
-        """ Other users following user """
-
-        found_user_list = [user for user in self.followers if user == other_user]
-        return len(found_user_list) == 1
-
-    def is_following(self, other_user):
-        """ User following other users """
-
-        found_user_list = [user for user in self.following if user == other_user]
-        return len(found_user_list) == 1
 
     @classmethod
     def signup(cls, username, password):
@@ -83,47 +78,18 @@ class User(db.Model):
 
         return False
 
-class Advise(db.Model):
-    """ An individual advise """
-
-    __tablename__ = "advise"
-
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text, nullable=False)
-
-    user_id = db.Column(db.Integer, db.ForeignKey(users.id, ondelete='CASCADE'), nullable=False)
-    user = db.relationship('User')
-
 
 class Likes(db.Model):
-    """ Mapping users likes to advise """
+    """ Mapping users likes to advice """
 
     __tablename__ = "likes"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(users.id, ondelete='CASCADE'), nullable=False)
-    advise_id = db.Column(db.Integer, db.ForeignKey(advise.id, ondelete='CASCADE'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    advice_id = db.Column(db.Integer, db.ForeignKey('advice.id', ondelete='CASCADE'), nullable=True)
     
 
-class Follows(db.Model):
-    """ Connection of a followers and following """
-
-    __tablename__ = "follows"
-
-    user_being_followed_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
-        primary_key=True,
-    )
-
-    user_following_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
-        primary_key=True,
-    )
-
-
-class connect_db(app):
+def connect_db(app):
     """ Connects database to Flask app """
 
     db.app = app

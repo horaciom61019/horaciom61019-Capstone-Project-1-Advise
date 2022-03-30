@@ -3,25 +3,40 @@ import requests
 
 API_BASE_URL = "https://api.adviceslip.com/advice"
 
-resp = requests.get(API_BASE_URL)
+class Requests:
+    """ A class used for API """
 
-def random_advise():
-    """ Returns a random advise """
-
-    resp = requests.get(API_BASE_URL)
-    print(resp.json())
-
-
-def advise_by_id(id):
-    """ Returns advice by id """
-
-    resp = requests.get(f"{API_BASE_URL}/search/{id}")
-    print(resp.json())
+    def __init__(self, id, search):
+        """
+        Parameters
+        id : int
+            advice id
+        search : str
+            Search query
+        """
+        self.id = id
+        self.search = search
 
 
-def search_advise(search):
-    """ Returns array of advice """
+    def random_advice():
+        """ Returns a random advice """
 
-    resp = requests.get(f"{API_BASE_URL}/search/{search}")
-    return resp.json()
+        resp = requests.get(API_BASE_URL)
 
+        return resp.json()['slip']
+
+
+    @classmethod
+    def advice_by_id(self, id):
+        """ Returns advice by id """
+
+        resp = requests.get(f"{API_BASE_URL}/search/{id}")
+        return resp.json()['slip']
+
+
+    @classmethod
+    def search_advice(self, search):
+        """ Returns array of advice """
+
+        resp = requests.get(f"{API_BASE_URL}/search/{search}")
+        return resp.json()['slip']
