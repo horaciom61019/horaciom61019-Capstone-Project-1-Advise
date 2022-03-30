@@ -2,13 +2,13 @@ from crypt import methods
 import os
 from distutils.log import debug
 from urllib import response
-from flask import Flask, redirect, render_template, flash, session, g
+from flask import Flask, redirect, render_template, flash, session, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 
-from models import db, connect_db, User, Advice, Follows, Likes
+from models import db, connect_db, User, Advice, Likes
 from api import Requests
-from forms import UserAddForm, LoginForm
+from forms import UserAddForm, LoginForm, EditProfileForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "unknown_secret"
@@ -147,6 +147,83 @@ def show_user(user_id):
     return render_template('/users/show.html', user=user, advice=advice)
 
 
+@app.route('/users/profile', methods=["GET", "POST"])
+def profile():
+    """Update profile for current user."""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = g.user
+    form = EditProfileForm(obj=user)
+
+    if form.validate_on_submit():
+        if User.authenticate(user.username, form.password.data):
+
+            user.username = form.username.data
+            user.password = form.password.data
+
+            db.session.commit()
+            return redirect(f'/users/{user.id}')
+
+        flash("Incorrect password, please try again.", 'danger') 
+
+    return render_template('users/edit.html', form=form, user_id=user.id)
+
+
+@app.route('/users/delete', methods=["POST"])
+def delete_user():
+    """Delete user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    do_logout()
+
+    db.session.delete(g.user)
+    db.session.commit()
+
+    return redirect("/signup")
+
+
+@app.route('/users/like/<int:advice_id>', methods=['POST'])
+def add_like(advice_id):
+    """Toggle a liked advice for the logged-in user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    liked_advice = Advice.query.get_or_404(advice_id)
+
+    if liked_advice.user_id == g.user.id:
+        return abort(403)
+
+    user_likes = g.user.likes
+
+    if liked_advice in user_likes:
+        g.user.likes = [like for like in user_likes if like != liked_advice]
+    else:
+        g.user.likes.append(liked_advice)
+
+    db.session.commit()
+
+    return redirect("/")
+
+
+@app.route('/users/<int:user_id>/likes', methods=["GET"])
+def show_likes(user_id):
+    """Shows liked messages by the logged-in user """
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    return render_template('users/likes.html', user=user, likes=user.likes)
+
 ##########################################################################################
 # Advice routes
 
@@ -199,10 +276,17 @@ def homepage():
     Show homepage:
 
     - anon users: redirect to Sign up
-    - logged in: recent advice of followed_users
+    - logged in: recent advice all users
     """
 
     if g.user:
-        return render_template('home.html')
+        advice = (Advice
+                    .query
+                    # .filter(Advice.user_id.in_(following_ids))
+                    .order_by(Advice.timestamp.desc())
+                    .limit(100)
+                    .all())
+
+        return render_template('home.html', advice=advice)
     else:
         return render_template('/home-anon.html')
