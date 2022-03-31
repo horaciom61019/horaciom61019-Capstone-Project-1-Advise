@@ -23,6 +23,9 @@ debug = DebugToolbarExtension(app)
 
 connect_db(app)
 
+# db.drop_all()
+# db.create_all()
+
 CURR_USER_KEY = "curr_user"
 ##########################################################################################
 # Global Variables
@@ -162,7 +165,7 @@ def profile():
         if User.authenticate(user.username, form.password.data):
             
             user.username = form.username.data
-            user.password = User.hash(form.new_password.data)
+            user.password = User.hash_pwd(form.new_password.data)
 
             db.session.commit()
             return redirect(f'/users/{user.id}')

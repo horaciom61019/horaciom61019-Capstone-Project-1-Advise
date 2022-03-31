@@ -22,9 +22,12 @@ class Advice(db.Model):
         default=datetime.utcnow(),
     )
 
-
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    user = db.relationship('User', cascade="all, delete")
+    user_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=True
+    )
+    user = db.relationship('User')
 
 
 class User(db.Model):
@@ -36,7 +39,7 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
 
-    advice = db.relationship('Advice', back_populates='user')
+    advice = db.relationship('Advice', backref='users')
 
     likes = db.relationship('Advice', secondary="likes")
 
@@ -44,11 +47,11 @@ class User(db.Model):
         return f"<User #{self.id}: {self.username}>"
 
     @classmethod
-    def hash(cls, password):
+    def hash_pwd(cls, password):
         """ Hashes password """
 
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8') 
-        return hashed_pwd    
+        return hashed_pwd
 
     @classmethod
     def signup(cls, username, password):
@@ -57,7 +60,7 @@ class User(db.Model):
         Hashes password and adds user to database.
         """
 
-        hashed_pwd = hash(password)
+        hashed_pwd = User.hash_pwd(password)
 
         user = User(
             username=username,
@@ -65,6 +68,7 @@ class User(db.Model):
         )
 
         db.session.add(user)
+        print(hashed_pwd)
         return user
 
     @classmethod
