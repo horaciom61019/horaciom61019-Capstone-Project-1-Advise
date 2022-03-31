@@ -1,0 +1,33 @@
+{% extends 'users/detail.html' %}
+
+{% block user_details %}
+  <div class="col-sm-9">
+    <div class="row">
+        <ul class="list-group" id="messages">
+          {% for advice in likes %}
+            <li class="list-group-item">
+              <a href="/api/advice/{{ advice.id  }}" class="message-link"/>
+              <div class="message-area">
+                <a href="/users/{{ advice.user.id }}">@{{ advice.user.username }}</a>
+                <span class="text-muted">{{ advice.timestamp.strftime('%d %B %Y') }}</span>
+                <p>{{ advice.text }}</p>
+              </div>
+              {% if user.id == g.user.id %}
+              <form method="POST" action="/users/like/{{ advice.id }}" class="messages-like">
+                <button class="
+                  btn 
+                  btn-sm 
+                  {{'btn-primary'}}"
+                >
+                  <i class="fa fa-thumbs-up">Liked</i> 
+                </button>
+              </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

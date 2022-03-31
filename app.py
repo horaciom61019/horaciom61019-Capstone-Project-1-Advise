@@ -147,7 +147,7 @@ def show_user(user_id):
                 .all())
 
 
-    return render_template('/users/show.html', user=user, advice=advice)
+    return render_template('/users/show.html', user=user, advice=advice, likes=user.likes)
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
@@ -201,8 +201,8 @@ def add_like(advice_id):
 
     liked_advice = Advice.query.get_or_404(advice_id)
 
-    if liked_advice.user_id == g.user.id:
-        return abort(403)
+    # if liked_advice.user_id == g.user.id:
+    #     return abort(403)
 
     user_likes = g.user.likes
 
@@ -247,12 +247,12 @@ def create_advice():
     return redirect(f'/users/{g.user.id}')
 
 
-@app.route('/api/advice/<int:advice_id>', methods=["POST"]) 
+@app.route('/api/advice/<int:advice_id>', methods=["GET"]) 
 def get_advice(advice_id):
     """ Show specific advice """
 
-    advice = Advice.query.get_or_404(advice_id)
-    return advice
+    advice = Advice.query.get(advice_id)
+    return render_template('advice/advice.html', advice=advice)
 
 
 @app.route('/api/advice/<int:advice_id>/delete', methods=["POST"])
@@ -283,13 +283,13 @@ def homepage():
     """
 
     if g.user:
+        user = User.query.get_or_404(g.user.id)
         advice = (Advice
                     .query
                     # .filter(Advice.user_id.in_(following_ids))
                     .order_by(Advice.timestamp.desc())
                     .limit(100)
                     .all())
-
-        return render_template('home.html', advice=advice)
+        return render_template('home.html', advice=advice, likes=user.likes)
     else:
         return render_template('/home-anon.html')

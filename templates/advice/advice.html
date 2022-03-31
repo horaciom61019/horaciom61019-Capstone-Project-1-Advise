@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <div class="bg"></div>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <ul class="list-group no-hover" id="messages">
+        <li class="list-group-item">
+          <div class="message-area">
+            <div class="message-heading">
+              <a href="/users/{{ advice.user.id }}">@{{ advice.user.username }}</a>
+              {% if g.user %}
+                {% if g.user.id == advice.user.id %}
+                  <form method="POST"
+                        action="/api/advice/{{advice.id}}/delete">
+                    <button class="btn btn-outline-danger">Delete</button>
+                  </form>
+                {% endif %}
+              {% endif %}
+            </div>
+            <p class="single-message">{{ advice.text }}</p>
+            <span class="text-muted">{{ advice.timestamp.strftime('%d %B %Y') }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+{% endblock %}

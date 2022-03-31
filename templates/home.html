@@ -12,13 +12,33 @@
           {% for advice in advice %}
 
             <li class="list-group-item">
-            <a href="/advice/{{ advice.id }}" class="message-link"/>
+                <a href="/api/advice/{{ advice.id }}" class="message-link">gf</a>
+                <div class="advice-area">
+                    <a href="/users/{{ advice.user.id }}">@{{ advice.user.username }}</a>
+                    <span class="text-muted">{{ advice.timestamp.strftime('%d %B %Y') }}</span>
+                    <p>{{ advice.text }}</p>
+                </div>
 
-            <div class="advice-area">
-                <a href="/users/{{ advice.user.id }}">@{{ advice.user.username }}</a>
-                <span class="text-muted">{{ advice.timestamp.strftime('%d %B %Y') }}</span>
-                <p>{{ advice.text }}</p>
-            </div>
+                <form method="POST" action="/users/like/{{advice.id}}" class="messages-like">
+                    {% if advice in likes%}
+                    <button class="
+                        btn 
+                        btn-sm 
+                        {{'btn-primary'}}"
+                    >
+                        <i>liked</i> 
+                    </button>
+                    {% else %}
+                    <button class="
+                        btn 
+                        btn-sm 
+                        {{'btn-secondary'}}"
+                    >
+                        <i>unliked</i> 
+                    </button>
+                    {% endif %}
+                </form>
+
             </li>
 
          {% endfor %}
