@@ -21,4 +21,6 @@ class EditProfileForm(FlaskForm):
     """ Form for editing profile """
 
     username = StringField('Username', validators=[DataRequired()])
+    new_password= PasswordField('Password', validators=[Length(min=6)])
     password = PasswordField('Password', validators=[Length(min=6)])
+    

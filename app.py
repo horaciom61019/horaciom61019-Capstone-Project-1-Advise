@@ -160,9 +160,9 @@ def profile():
 
     if form.validate_on_submit():
         if User.authenticate(user.username, form.password.data):
-
+            
             user.username = form.username.data
-            user.password = form.password.data
+            user.password = User.hash(form.new_password.data)
 
             db.session.commit()
             return redirect(f'/users/{user.id}')
