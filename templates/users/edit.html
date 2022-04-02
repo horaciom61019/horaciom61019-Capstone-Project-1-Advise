@@ -2,7 +2,7 @@
 
 {% block content %}
 
-  <div class="row justify-content-md-center">
+  <!-- <div class="row justify-content-md-center">
     <div class="col-md-4">
       <h2 class="join-message">Edit Your Profile.</h2>
       <form method="POST" id="user_form">
@@ -30,6 +30,20 @@
           <a href="/users/{{ user_id }}" class="btn btn-outline-secondary">Cancel</a>
         </div>
       </form>
+    </div>
+  </div> -->
+
+  <div class="edit card text-center">
+    <!-- <h2 class=" card-header edit-message bg-primary">Edit Profile</h2> -->
+    <div class="card-body"> 
+        <form method="POST" id="user_form">
+            {% include '/users/forms.html'%}
+            <!-- <button class="btn btn-primary btn-lg btn-block join-btn">Sign me up!</button> -->
+            <div class="edit-btn-area">
+              <button class="btn btn-success">Edit this user!</button>
+              <a href="/users/{{ user_id }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
   </div>
 

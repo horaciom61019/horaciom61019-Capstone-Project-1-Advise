@@ -1,11 +1,5 @@
-{% extends 'base.html' %}
-{% block content %}
-    <div class="d-flex justify-content-center m-4">
-        <form action="/api/advice" method="POST">
-            <button class="btn btn-outline-success btn-lg btn-block" type="submit">Get my advice!</button>
-        </form>
-    </div>
-
+{% extends 'templates/home.html' %}
+{% block advice_details %}
     <div class="row justify-content-center">
         <div class="col-md-6">
             {% for advice in advice %}
@@ -38,9 +32,9 @@
                                 <button class="
                                     btn 
                                     btn-sm 
-                                    {{'btn-outline-secondary'}}"
+                                    {{'btn-secondary'}}"
                                     >
-                                    like
+                                    unliked
                                 </button>
                                 {% endif %}
                             </form>
@@ -61,7 +55,5 @@
             </div>
             {% endfor %}
         </div>
-      </div>
-
+    </div>
 {% endblock %}
-

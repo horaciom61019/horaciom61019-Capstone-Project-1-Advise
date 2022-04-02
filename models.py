@@ -14,6 +14,7 @@ class Advice(db.Model):
     __tablename__ = "advice"
 
     id = db.Column(db.Integer, primary_key=True)
+    # advice_id = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)
 
     timestamp = db.Column(
@@ -97,7 +98,7 @@ class Likes(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    advice_id = db.Column(db.Integer, db.ForeignKey('advice.id', ondelete='CASCADE'), nullable=True)
+    advice_id = db.Column(db.Integer, db.ForeignKey('advice.id', ondelete='CASCADE'), nullable=False)
     
 
 def connect_db(app):

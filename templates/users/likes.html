@@ -1,32 +1,59 @@
 {% extends 'users/detail.html' %}
 
 {% block user_details %}
-  <div class="col-sm-9">
-    <div class="row">
-        <ul class="list-group" id="messages">
-          {% for advice in likes %}
-            <li class="list-group-item">
-              <a href="/api/advice/{{ advice.id  }}" class="message-link"/>
-              <div class="message-area">
-                <a href="/users/{{ advice.user.id }}">@{{ advice.user.username }}</a>
-                <span class="text-muted">{{ advice.timestamp.strftime('%d %B %Y') }}</span>
-                <p>{{ advice.text }}</p>
-              </div>
-              {% if user.id == g.user.id %}
-              <form method="POST" action="/users/like/{{ advice.id }}" class="messages-like">
-                <button class="
-                  btn 
-                  btn-sm 
-                  {{'btn-primary'}}"
-                >
-                  <i class="fa fa-thumbs-up">Liked</i> 
-                </button>
-              </form>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+        {% for advice in likes %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="/users/{{ advice.user.id }}">@{{ advice.user.username }}</a>
+                </h5>
+                <div class="advice-link-parent">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <span>{{ advice.timestamp.strftime('%d %B %Y') }}</span>
+                    </h6>
+                    <p class="card-text">{{ advice.text }}</p>
+                    <a href="/api/advice/{{ advice.id }}" class="card-link">
+                        <span class="advice-link"></span>
+                    </a>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="p-2">
+                        <form method="POST" action="/users/like/{{advice.id}}" class="messages-like">
+                            {% if advice in likes%}
+                            <button class="
+                                btn 
+                                btn-sm 
+                                {{'btn-primary'}}"
+                                >
+                                liked
+                            </button>
+                            {% else %}
+                            <button class="
+                                btn 
+                                btn-sm 
+                                {{'btn-outline-secondary'}}"
+                                >
+                                like
+                            </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="p-2">
+                        {% if g.user %}
+                        {% if g.user.id == advice.user.id %}
+                        <form method="POST" action="/api/advice/{{advice.id}}/delete">
+                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
   </div>
 

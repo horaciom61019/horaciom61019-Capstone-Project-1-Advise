@@ -91,6 +91,7 @@ def new_user():
             return render_template('users/signup.html', form=form)
 
         do_login(user)
+        flash(f"Welcome {user.username}!", 'success')
 
         return redirect('/')
 
@@ -143,7 +144,7 @@ def show_user(user_id):
                 .query
                 .filter(Advice.user_id == user_id)
                 .order_by(Advice.timestamp.desc())
-                .limit(50)
+                .limit(100)
                 .all())
 
 
@@ -240,7 +241,7 @@ def create_advice():
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    new_advice = Advice(id=response['id'], text=response['advice'])
+    new_advice = Advice(text=response['advice'])
     g.user.advice.append(new_advice)
     db.session.commit()
 
@@ -286,10 +287,13 @@ def homepage():
         user = User.query.get_or_404(g.user.id)
         advice = (Advice
                     .query
-                    # .filter(Advice.user_id.in_(following_ids))
                     .order_by(Advice.timestamp.desc())
                     .limit(100)
                     .all())
         return render_template('home.html', advice=advice, likes=user.likes)
     else:
         return render_template('/home-anon.html')
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template("404.html"), 404
