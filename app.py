@@ -2,7 +2,7 @@ from crypt import methods
 import os
 from distutils.log import debug
 from urllib import response
-from flask import Flask, redirect, render_template, flash, session, g, abort
+from flask import Flask, redirect, render_template, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
@@ -28,7 +28,7 @@ connect_db(app)
 
 CURR_USER_KEY = "curr_user"
 ##########################################################################################
-# Global Variables
+# Global
 
 
 
@@ -57,6 +57,13 @@ def do_logout():
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
+
+def verify_user():
+    """ Verify user id logged in """
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -155,9 +162,7 @@ def show_user(user_id):
 def profile():
     """Update profile for current user."""
     
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    verify_user()
 
     user = g.user
     form = EditProfileForm(obj=user)
@@ -180,9 +185,7 @@ def profile():
 def delete_user():
     """Delete user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    verify_user()
 
     do_logout()
 
@@ -196,9 +199,7 @@ def delete_user():
 def add_like(advice_id):
     """Toggle a liked advice for the logged-in user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    verify_user()
 
     liked_advice = Advice.query.get_or_404(advice_id)
 
@@ -221,9 +222,7 @@ def add_like(advice_id):
 def show_likes(user_id):
     """Shows liked messages by the logged-in user """
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    verify_user()
 
     user = User.query.get_or_404(user_id)
     return render_template('users/likes.html', user=user, likes=user.likes)
@@ -237,9 +236,7 @@ def create_advice():
 
     response = Requests.random_advice()
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    verify_user()
 
     new_advice = Advice(text=response['advice'])
     g.user.advice.append(new_advice)
@@ -252,7 +249,7 @@ def create_advice():
 def get_advice(advice_id):
     """ Show specific advice """
 
-    advice = Advice.query.get(advice_id)
+    advice = Advice.query.get_or_404(advice_id)
     return render_template('advice/advice.html', advice=advice)
 
 
@@ -260,9 +257,7 @@ def get_advice(advice_id):
 def delete_advice(advice_id):
     """ Delete advice """
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    verify_user()
 
     advice = Advice.query.get_or_404(advice_id)
     db.session.delete(advice)
@@ -272,7 +267,7 @@ def delete_advice(advice_id):
 
 
 ##########################################################################################
-# Home 
+# Home and 404
 
 @app.route('/')
 def homepage():
@@ -296,4 +291,4 @@ def homepage():
 
 @app.errorhandler(404)
 def not_found(error):
-    return render_template("404.html"), 404
+    return render_template("/404.html"), 404

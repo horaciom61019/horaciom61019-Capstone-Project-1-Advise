@@ -14,7 +14,6 @@ class Advice(db.Model):
     __tablename__ = "advice"
 
     id = db.Column(db.Integer, primary_key=True)
-    # advice_id = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)
 
     timestamp = db.Column(
@@ -69,7 +68,6 @@ class User(db.Model):
         )
 
         db.session.add(user)
-        print(hashed_pwd)
         return user
 
     @classmethod

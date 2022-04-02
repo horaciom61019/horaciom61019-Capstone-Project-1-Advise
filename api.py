@@ -25,7 +25,7 @@ class Requests:
 
         return resp.json()['slip']
 
-
+    
     @classmethod
     def advice_by_id(self, id):
         """ Returns advice by id """
