@@ -11,7 +11,7 @@ from api import Requests
 from forms import UserAddForm, LoginForm, EditProfileForm
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get("unknown_secret", "shh") 
+app.config['SECRET_KEY'] = os.environ.get("unknown_secret", "unknown_secret") 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql:///advice-app')
