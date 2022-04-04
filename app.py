@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("unknown_secret", "shh") 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql:///advice-app')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('postgresql://DATABASE_URL', 'postgresql:///advice-app')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
