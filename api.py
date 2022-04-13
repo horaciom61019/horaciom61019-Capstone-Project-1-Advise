@@ -3,7 +3,7 @@ import requests
 
 API_BASE_URL = "https://api.adviceslip.com/advice"
 
-class Requests:
+class RequestAPI:
     """ A class used for API """
 
     def __init__(self, id, search):

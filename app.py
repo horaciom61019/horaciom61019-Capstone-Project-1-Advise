@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from models import db, connect_db, User, Advice, Likes
-from api import Requests
+from api import RequestAPI
 from forms import UserAddForm, LoginForm, EditProfileForm
 
 app = Flask(__name__)
@@ -234,7 +234,7 @@ def show_likes(user_id):
 def create_advice():
     """ Request advice from API and adds to database """
 
-    response = Requests.random_advice()
+    response = RequestAPI.random_advice()
 
     verify_user()
 
